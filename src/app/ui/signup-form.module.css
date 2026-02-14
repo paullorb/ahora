@@ -1,0 +1,21 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--d1);
+  background-color: var(--background-color-2);
+  padding: var(--d2);
+  border-radius: var(--border-radius);
+}

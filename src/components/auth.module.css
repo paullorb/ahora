@@ -1,0 +1,16 @@
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--d2)
+}
+
+.closeButton {
+  position: absolute;
+  right: var(--d1);
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 30;
+}

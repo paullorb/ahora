@@ -1,0 +1,23 @@
+body {
+  --background-color-1: #f0f0f0;
+  --background-color-2: #e0e0e0;
+  --background-color-3: #d0d0d0;
+  --overlay-color: rgba(0, 0, 0, 0.5);
+  --text-color-1: #333;
+  --text-color-2: #555;
+  --primary-color: #0070f3;
+  --secondary-color: #555;
+  --border-radius: 5px;
+  --d0: 0px;
+  --d1: 10px;
+  --d2: 20px;
+  --d3: 30px;
+  --d4: 40px;
+  --d5: 50px;
+  --font-size-1: 14px;
+  --font-size-2: 16px;
+  --font-size-3: 18px;
+  --font-size-4: 24px;
+  --font-size-5: 48px;
+  --border-radius: 5px;
+}

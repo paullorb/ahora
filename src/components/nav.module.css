@@ -2,18 +2,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  background-color: #dedede;
-  padding: 0 20px;
+  gap: var(--gap-2);
+  background-color: var(--background-color-2);
+  padding: var(--d0) var(--d2);
 }
 
-.user {
+.auth {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--gap-1)
 }
 
 .buttons {
   display: flex;
-  gap: 10px;
+  gap: var(--gap-1);
 }
