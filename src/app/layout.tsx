@@ -8,6 +8,7 @@ import {
   UserButton,
 } from '@clerk/nextjs'
 import './globals.css'
+import './standards.css'
 
 export const metadata: Metadata = {
   title: 'Clerk Next.js Quickstart',
