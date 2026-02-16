@@ -11,6 +11,12 @@ export default function StopWatch() {
   const [title, setTitle] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const [suggestions, setSuggestions] = useState<string[]>([
+    "Slow Work",
+    "Fitness",
+    "Reading",
+  ]);
+
   useEffect(() => {
     if (!isRunning) return;
 
@@ -23,6 +29,7 @@ export default function StopWatch() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.activity}>
         <input
           type="text"
           className={styles.input}
@@ -33,16 +40,45 @@ export default function StopWatch() {
           onFocus={() => setShowDropdown(true)}
           onBlur={() => setShowDropdown(false)}
         />
-        {showDropdown && (
-          <div className={styles.dropDown}>
-            <div className={styles.dropdownItem} onMouseDown={() => setTitle("Slow Work")}>Slow Work</div>
-            <div className={styles.dropdownItem} onMouseDown={() => setTitle("Fitness")}>Fitness</div>
-            <div className={styles.dropdownItem} onMouseDown={() => setTitle("Reading")}>Reading</div>
-          </div>
-        )}
+        <button
+          type="button"
+          className={styles.addButton}
+          onClick={() => {
+            const val = title.trim();
+            if (!val) return;
+            const exists = suggestions.some(
+              (s) => s.toLowerCase() === val.toLowerCase()
+            );
+            if (exists) {
+              alert(`${val} already exists`);
+              return;
+            }
+            setSuggestions((prev) => [val, ...prev]);
+            // keep the input value so the user sees the entry after adding
+            setShowDropdown(true);
+          }}
+        >
+          +
+        </button>
+      </div>
+      {showDropdown && (
+        <div className={styles.dropDown}>
+          {suggestions.map((s) => (
+            <div
+              key={s}
+              className={styles.dropdownItem}
+              onMouseDown={() => setTitle(s)}
+            >
+              {s}
+            </div>
+          ))}
+        </div>
+      )}
       <h1 className={styles.time}>{formatTime(elapsed)}</h1>
       <div className={styles.buttons}>
-        <button className={styles.button} onClick={() => setIsRunning(!isRunning)}>{isRunning ? "Stop" : "Start"}</button>
+        <button className={styles.button} onClick={() => setIsRunning(!isRunning)}>
+          {isRunning ? "Stop" : "Start"}
+        </button>
         <button className={styles.button} onClick={() => setElapsed(0)}>Reset</button>
       </div>
     </div>

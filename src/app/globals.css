@@ -10,8 +10,8 @@ button {
   cursor: pointer;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
+/* input {
+  border: none;
+  background-color: transparent;
+  outline: none;
+} */

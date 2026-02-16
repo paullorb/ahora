@@ -10,6 +10,17 @@
   text-align: center;
   font-size: var(--font-size-3);
   padding: var(--d1) var(--d2);
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+}
+
+.addButton {
+  padding: var(--d1) var(--d2);
+  font-size: var(--font-size-3);
+  background-color: #0000007b;
+  color: white;
+  border-radius: var(--border-radius);
+  cursor: pointer;
 }
 
 .dropDown {
