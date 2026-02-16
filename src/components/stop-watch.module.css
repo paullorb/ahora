@@ -41,6 +41,20 @@
   z-index: 10;
 }
 
+.deleteButton {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  color: #999;
+  padding: 0 4px;
+}
+
+.deleteButton:hover {
+  color: #d32f2f;
+}
+
 .time {
   font-size: var(--font-size-5)
 }

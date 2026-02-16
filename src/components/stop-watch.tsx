@@ -8,7 +8,7 @@ export default function StopWatch() {
   const [elapsed, setElapsed] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
-  const [title, setTitle] = useState("");
+  const [activity, setActivity] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
   const [suggestions, setSuggestions] = useState<string[]>([
@@ -16,6 +16,8 @@ export default function StopWatch() {
     "Fitness",
     "Reading",
   ]);
+
+  const defaultSuggestions = ["Slow Work", "Fitness", "Reading"];
 
   useEffect(() => {
     if (!isRunning) return;
@@ -27,6 +29,17 @@ export default function StopWatch() {
     return () => clearInterval(interval);
   }, [isRunning]);
 
+  const filteredSuggestions =
+    activity.trim().length > 0
+      ? suggestions.filter((s) =>
+          s.toLowerCase().startsWith(activity.trim().toLowerCase())
+        )
+      : suggestions;
+
+  const handleDeleteActivity = (activityToDelete: string) => {
+    setSuggestions((prev) => prev.filter((s) => s !== activityToDelete));
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.activity}>
@@ -35,8 +48,11 @@ export default function StopWatch() {
           className={styles.input}
           placeholder="Deep Work"
           disabled={isRunning}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={activity}
+          onChange={(e) => {
+            setActivity(e.target.value);
+            setShowDropdown(true); 
+          }}
           onFocus={() => setShowDropdown(true)}
           onBlur={() => setShowDropdown(false)}
         />
@@ -44,7 +60,7 @@ export default function StopWatch() {
           type="button"
           className={styles.addButton}
           onClick={() => {
-            const val = title.trim();
+            const val = activity.trim();
             if (!val) return;
             const exists = suggestions.some(
               (s) => s.toLowerCase() === val.toLowerCase()
@@ -54,22 +70,33 @@ export default function StopWatch() {
               return;
             }
             setSuggestions((prev) => [val, ...prev]);
-            // keep the input value so the user sees the entry after adding
             setShowDropdown(true);
           }}
         >
           +
         </button>
       </div>
-      {showDropdown && (
+      {showDropdown && filteredSuggestions.length > 0 && (
         <div className={styles.dropDown}>
-          {suggestions.map((s) => (
+          {filteredSuggestions.map((s) => (
             <div
               key={s}
               className={styles.dropdownItem}
-              onMouseDown={() => setTitle(s)}
+              onMouseDown={() => setActivity(s)}
             >
               {s}
+              {!defaultSuggestions.includes(s) && (
+                <button
+                  type="button"
+                  className={styles.deleteButton}
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    handleDeleteActivity(s);
+                  }}
+                >
+                  ×
+                </button>
+              )}
             </div>
           ))}
         </div>
