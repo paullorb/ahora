@@ -1,4 +1,3 @@
-import clientPromise from "@/app/lib/mongo"
 import { NextResponse } from "next/server"
 
 export async function GET(req: Request) {

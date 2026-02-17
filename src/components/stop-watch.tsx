@@ -7,8 +7,9 @@ import styles from "./stop-watch.module.css";
 export default function StopWatch() {
   const [elapsed, setElapsed] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
 
-  const [activity, setActivity] = useState("");
+  const [activityName, setActivityName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
   const [suggestions, setSuggestions] = useState<string[]>([
@@ -30,14 +31,36 @@ export default function StopWatch() {
   }, [isRunning]);
 
   const filteredSuggestions =
-    activity.trim().length > 0
+    activityName.trim().length > 0
       ? suggestions.filter((s) =>
-          s.toLowerCase().startsWith(activity.trim().toLowerCase())
+          s.toLowerCase().startsWith(activityName.trim().toLowerCase())
         )
       : suggestions;
 
   const handleDeleteActivity = (activityToDelete: string) => {
     setSuggestions((prev) => prev.filter((s) => s !== activityToDelete));
+  };
+
+  const handleReset = async () => {
+    if (isRunning || (elapsed === 0 && startTime === null)) return;
+    
+    // Save the time entry
+    if (startTime && activityName) {
+      await fetch('/api/times', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startTime,
+          duration: elapsed,
+          activity: activityName
+        })
+      });
+    }
+    
+    // Reset state
+    setElapsed(0);
+    setStartTime(null);
+    setActivityName("");
   };
 
   return (
@@ -48,9 +71,9 @@ export default function StopWatch() {
           className={styles.input}
           placeholder="Deep Work"
           disabled={isRunning}
-          value={activity}
+          value={activityName}
           onChange={(e) => {
-            setActivity(e.target.value);
+            setActivityName(e.target.value);
             setShowDropdown(true); 
           }}
           onFocus={() => setShowDropdown(true)}
@@ -60,7 +83,7 @@ export default function StopWatch() {
           type="button"
           className={styles.addButton}
           onClick={() => {
-            const val = activity.trim();
+            const val = activityName.trim();
             if (!val) return;
             const exists = suggestions.some(
               (s) => s.toLowerCase() === val.toLowerCase()
@@ -82,7 +105,7 @@ export default function StopWatch() {
             <div
               key={s}
               className={styles.dropdownItem}
-              onMouseDown={() => setActivity(s)}
+              onMouseDown={() => setActivityName(s)}
             >
               {s}
               {!defaultSuggestions.includes(s) && (
@@ -106,7 +129,7 @@ export default function StopWatch() {
         <button className={styles.button} onClick={() => setIsRunning(!isRunning)}>
           {isRunning ? "Stop" : "Start"}
         </button>
-        <button className={styles.button} onClick={() => setElapsed(0)}>Reset</button>
+        <button className={styles.button} onClick={handleReset} disabled={isRunning}>Reset</button>
       </div>
     </div>
   );
