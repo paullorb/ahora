@@ -79,25 +79,31 @@ export default function StopWatch() {
           onFocus={() => setShowDropdown(true)}
           onBlur={() => setShowDropdown(false)}
         />
-        <button
-          type="button"
-          className={styles.addButton}
-          onClick={() => {
-            const val = activityName.trim();
-            if (!val) return;
-            const exists = suggestions.some(
-              (s) => s.toLowerCase() === val.toLowerCase()
-            );
-            if (exists) {
-              alert(`${val} already exists`);
-              return;
-            }
-            setSuggestions((prev) => [val, ...prev]);
-            setShowDropdown(true);
-          }}
-        >
-          +
-        </button>
+        {showDropdown &&
+          activityName.trim() !== "" &&
+          !suggestions.some(
+            (s) => s.toLowerCase() === activityName.trim().toLowerCase()
+          ) && (
+            <button
+              type="button"
+              className={styles.addButton}
+              onClick={() => {
+                const val = activityName.trim();
+                if (!val) return;
+                const exists = suggestions.some(
+                  (s) => s.toLowerCase() === val.toLowerCase()
+                );
+                if (exists) {
+                  alert(`${val} already exists`);
+                  return;
+                }
+                setSuggestions((prev) => [val, ...prev]);
+                setShowDropdown(true);
+              }}
+            >
+              +
+            </button>
+          )}
       </div>
       {showDropdown && filteredSuggestions.length > 0 && (
         <div className={styles.dropDown}>
@@ -129,7 +135,9 @@ export default function StopWatch() {
         <button className={styles.button} onClick={() => setIsRunning(!isRunning)}>
           {isRunning ? "Stop" : "Start"}
         </button>
-        <button className={styles.button} onClick={handleReset} disabled={isRunning}>Reset</button>
+        {elapsed > 0 && !isRunning && (
+          <button className={styles.button} onClick={handleReset}>Reset</button>
+        )}
       </div>
     </div>
   );
