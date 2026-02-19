@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { formatTime } from "@/utils/formatTime";
+import { parseTimeString } from "@/app/lib/timeUtils";
 import styles from "./stop-watch.module.css";
+import TimeModal from "./timeModal";
 
 export default function StopWatch() {
   const [elapsed, setElapsed] = useState(0);
@@ -22,6 +24,55 @@ export default function StopWatch() {
   const [countdownTarget, setCountdownTarget] = useState<number | null>(null);
 
   const defaultSuggestions = ["Slow Work", "Fitness", "Reading"];
+
+  const STORAGE_KEY = "ahora-stopwatch-state";
+
+  // Restore state from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const state = JSON.parse(saved);
+        setActivityName(state.activityName ?? "");
+        setIsCountdown(state.isCountdown ?? false);
+        setCountdownTarget(state.countdownTarget ?? null);
+
+        if (state.isRunning && state.startTime) {
+          const now = Date.now();
+          if (state.isCountdown && state.countdownTarget != null) {
+            const remaining = Math.max(state.countdownTarget - (now - state.startTime), 0);
+            setElapsed(remaining);
+            setIsRunning(remaining > 0);
+            setStartTime(now - (state.countdownTarget - remaining));
+          } else {
+            const elapsedNow = now - state.startTime;
+            setElapsed(elapsedNow);
+            setIsRunning(true);
+            setStartTime(state.startTime);
+          }
+        } else {
+          setElapsed(state.elapsed ?? 0);
+          setIsRunning(false);
+          setStartTime(null);
+        }
+      } catch {}
+    }
+  }, []);
+
+  // Save state to localStorage whenever relevant state changes
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        elapsed,
+        isRunning,
+        startTime,
+        activityName,
+        isCountdown,
+        countdownTarget,
+      })
+    );
+  }, [elapsed, isRunning, startTime, activityName, isCountdown, countdownTarget]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -95,25 +146,6 @@ export default function StopWatch() {
     }
   }, [isEditingTime]);
 
-  // Parse input like "mm:ss" or "hh:mm:ss"
-  function parseTimeString(str: string): number {
-    const parts = str.split(":").map((p) => p.trim());
-    if (parts.length === 2) {
-      // mm:ss
-      const [mm, ss] = parts;
-      return (parseInt(mm) * 60 + parseInt(ss)) * 1000;
-    }
-    if (parts.length === 3) {
-      // hh:mm:ss
-      const [hh, mm, ss] = parts;
-      return (parseInt(hh) * 3600 + parseInt(mm) * 60 + parseInt(ss)) * 1000;
-    }
-    // fallback: try as seconds
-    const asNum = Number(str);
-    if (!isNaN(asNum)) return asNum * 1000;
-    return 0;
-  }
-
   const handleTimeInputBlur = () => {
     setIsEditingTime(false);
     const ms = parseTimeString(inputTime);
@@ -134,14 +166,6 @@ export default function StopWatch() {
     }
   };
 
-  // Predefined countdown values in milliseconds
-  const presetTimes = [
-    { label: "5'", ms: 5 * 60 * 1000 },
-    { label: "10'", ms: 10 * 60 * 1000 },
-    { label: "25'", ms: 25 * 60 * 1000 },
-    { label: "60'", ms: 60 * 60 * 1000 },
-  ];
-
   const handlePresetClick = (ms: number) => {
     setElapsed(ms);
     setIsCountdown(true);
@@ -149,6 +173,72 @@ export default function StopWatch() {
     setIsRunning(false);
     setShowModal(false);
   };
+
+  const handleStartStop = () => {
+    if (isRunning) {
+      setIsRunning(false);
+    } else {
+      setStartTime(Date.now() - elapsed);
+      setIsRunning(true);
+    }
+  };
+
+  // Add state for scheduled timer
+  const [scheduledStart, setScheduledStart] = useState<number | null>(null);
+  const [scheduledEnd, setScheduledEnd] = useState<number | null>(null);
+
+  // Helper to parse "HH:MM" to Date object for today
+  function parseTodayTime(str: string): Date {
+    const [h, m] = str.split(":").map(Number);
+    const now = new Date();
+    now.setHours(h, m, 0, 0);
+    return now;
+  }
+
+  // Handler for the time range input
+  const handleTimeRangeSet = (start: string, end: string) => {
+    const startDate = parseTodayTime(start);
+    const endDate = parseTodayTime(end);
+    if (endDate <= startDate) {
+      alert("End time must be after start time");
+      return;
+    }
+    setScheduledStart(startDate.getTime());
+    setScheduledEnd(endDate.getTime());
+    setElapsed(0);
+    setIsCountdown(false);
+    setCountdownTarget(null);
+    setIsRunning(false);
+  };
+
+  // Effect to start/stop timer at scheduled times
+  useEffect(() => {
+    if (!scheduledStart || !scheduledEnd) return;
+
+    const now = Date.now();
+
+    if (now >= scheduledStart && now < scheduledEnd) {
+      // Start timer if within the range
+      setIsRunning(true);
+      setStartTime(scheduledStart);
+      setElapsed(now - scheduledStart);
+    } else if (now >= scheduledEnd) {
+      // Stop timer if past end
+      setIsRunning(false);
+      setElapsed(scheduledEnd - scheduledStart);
+      setStartTime(null);
+      setScheduledStart(null);
+      setScheduledEnd(null);
+    } else {
+      // Wait until start time
+      const timeout = setTimeout(() => {
+        setIsRunning(true);
+        setStartTime(scheduledStart);
+        setElapsed(0);
+      }, scheduledStart - now);
+      return () => clearTimeout(timeout);
+    }
+  }, [scheduledStart, scheduledEnd]);
 
   return (
     <div className={styles.container}>
@@ -248,44 +338,20 @@ export default function StopWatch() {
         </h1>
       )}
       {showModal && !isEditingTime && (
-        <div
-          className={styles.modal}
-          style={{
-            position: "absolute",
-            left: h1Ref.current?.offsetLeft,
-            top: (h1Ref.current?.offsetTop ?? 0) + (h1Ref.current?.offsetHeight ?? 0) + 8,
-            zIndex: 10,
-            background: "#fff",
-            border: "1px solid #ccc",
-            borderRadius: 8,
-            padding: 16,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          <div style={{ marginBottom: 8 }}>Set countdown:</div>
-          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-            {presetTimes.map((preset) => (
-              <button
-                key={preset.label}
-                style={{
-                  fontFamily: "monospace",
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  border: "1px solid #aaa",
-                  background: "#f5f5f5",
-                  cursor: "pointer",
-                }}
-                onClick={() => handlePresetClick(preset.ms)}
-              >
-                {preset.label}
-              </button>
-            ))}
-          </div>
-          <button onClick={() => setShowModal(false)}>Close</button>
-        </div>
+        <TimeModal
+          left={h1Ref.current?.offsetLeft}
+          top={(h1Ref.current?.offsetTop ?? 0) + (h1Ref.current?.offsetHeight ?? 0) + 8}
+          onPresetClick={handlePresetClick}
+          onTimeRangeSet={handleTimeRangeSet}
+          onClose={() => setShowModal(false)}
+        />
       )}
       <div className={styles.buttons}>
-        <button className={styles.button} onClick={() => setIsRunning(!isRunning)}>
+        <button
+          className={styles.button}
+          onClick={handleStartStop}
+          disabled={!activityName.trim()}
+        >
           {isRunning ? "Stop" : "Start"}
         </button>
         {elapsed > 0 && !isRunning && (

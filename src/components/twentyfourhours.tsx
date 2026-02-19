@@ -13,7 +13,7 @@ function getCurrentHourAndMinutes() {
   };
 }
 
-export default function Today() {
+export default function TwentyFourHours() {
   const { hour: currentHour, label: currentLabel } = getCurrentHourAndMinutes();
   const hours = getSurroundingHours(currentHour);
 
