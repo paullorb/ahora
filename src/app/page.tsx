@@ -1,6 +1,6 @@
 import StopWatch from "@/components/stop-watch";
 import styles from "./page.module.css";
-import Nav from "@/components/nav";
+import Nav from "@/app/ui/nav";
 import Today from "@/components/twentyfourhours";
 import BigPicture from "@/components/bigPicture";
 

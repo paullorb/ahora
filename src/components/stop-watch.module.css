@@ -14,56 +14,10 @@
   border-radius: var(--border-radius);
 }
 
-.addButton {
-  padding: var(--d1) var(--d2);
-  font-size: var(--font-size-3);
-  background-color: #0000007b;
-  color: white;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-}
-
-.dropDown {
-  display: flex;
-  flex-direction: column;
-  padding: var(--d1);
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 45;
-  left: 0;
-  right: 0;
-  width: 100%;
-  background-color: var(--background-color-2);
-  border: 1px solid #ccc;
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-.deleteButton {
-  margin-left: auto;
-  background: none;
-  border: none;
-  font-size: 1.2em;
-  cursor: pointer;
-  color: #999;
-  padding: 0 4px;
-}
-
-.deleteButton:hover {
-  color: #d32f2f;
-}
-
 .time {
   width: 100%;
   text-align: center;
   font-size: var(--font-size-5)
-}
-
-.buttons {
-  display: flex;
-  gap: 5px;
 }
 
 .button {
