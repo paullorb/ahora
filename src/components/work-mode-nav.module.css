@@ -1,0 +1,25 @@
+.nav {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 12px;
+  background: #e5e7eb;
+}
+
+.item {
+  border: none;
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-size: 0.86rem;
+  color: #374151;
+  background: transparent;
+}
+
+.item:hover {
+  background: #d1d5db;
+}
+
+.active {
+  background: #111827;
+  color: #f9fafb;
+}

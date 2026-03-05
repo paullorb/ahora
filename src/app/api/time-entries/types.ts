@@ -1,9 +1,9 @@
 export type TimeEntry = {
   activityName: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: number;
+  endTime: number;
   duration: number;
-  createdAt: Date;
+  createdAt: number;
 };
 
 export type DomainError = {

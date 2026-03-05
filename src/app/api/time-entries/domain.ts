@@ -16,9 +16,9 @@ export function createTimeEntry(
 
   return {
     activityName: activityName.trim(),
-    startTime: new Date(startTime),
-    endTime: new Date(endTime),
+    startTime,
+    endTime,
     duration,
-    createdAt: new Date()
+    createdAt: Date.now()
   };
 }

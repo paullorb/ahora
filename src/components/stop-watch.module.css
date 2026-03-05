@@ -17,7 +17,8 @@
 .time {
   width: 100%;
   text-align: center;
-  font-size: var(--font-size-5)
+  font-size: var(--font-size-5);
+  color: inherit;
 }
 
 .button {

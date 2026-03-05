@@ -1,0 +1,24 @@
+.toggle {
+  display: inline-flex;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f9fafb;
+}
+
+.item {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  color: #4b5563;
+  background: transparent;
+  border: none;
+}
+
+.item:hover {
+  background: #f3f4f6;
+}
+
+.active {
+  background: #2563eb;
+  color: #ffffff;
+}
